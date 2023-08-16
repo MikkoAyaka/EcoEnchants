@@ -22,12 +22,7 @@ import com.willfp.ecoenchants.enchants.registerVanillaEnchants
 import com.willfp.ecoenchants.integrations.EnchantRegistrations
 import com.willfp.ecoenchants.integrations.plugins.CMIIntegration
 import com.willfp.ecoenchants.integrations.plugins.EssentialsIntegration
-import com.willfp.ecoenchants.mechanics.AnvilSupport
-import com.willfp.ecoenchants.mechanics.EnchantingTableSupport
-import com.willfp.ecoenchants.mechanics.ExtraItemSupport
-import com.willfp.ecoenchants.mechanics.GrindstoneSupport
-import com.willfp.ecoenchants.mechanics.LootSupport
-import com.willfp.ecoenchants.mechanics.VillagerSupport
+import com.willfp.ecoenchants.mechanics.*
 import com.willfp.ecoenchants.target.EnchantLookup.clearEnchantCache
 import com.willfp.ecoenchants.target.EnchantLookup.getActiveEnchantLevel
 import com.willfp.ecoenchants.target.EnchantLookup.heldEnchantLevels
@@ -39,6 +34,7 @@ import com.willfp.libreforge.loader.configs.ConfigCategory
 import com.willfp.libreforge.registerHolderPlaceholderProvider
 import com.willfp.libreforge.registerHolderProvider
 import com.willfp.libreforge.registerPlayerRefreshFunction
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 
@@ -62,7 +58,10 @@ class EcoEnchantsPlugin : LibreforgePlugin() {
 
     override fun handleEnable() {
         registerHolderProvider { it.heldEnchantLevels }
-        registerPlayerRefreshFunction { it.clearEnchantCache() }
+        registerPlayerRefreshFunction {
+            it.clearEnchantCache()
+            it.illegalEnchantScan()
+        }
 
         registerHolderPlaceholderProvider<FoundEcoEnchantLevel> { it, _ ->
             listOf(
@@ -77,14 +76,12 @@ class EcoEnchantsPlugin : LibreforgePlugin() {
             )
         }
     }
-
     override fun handleAfterLoad() {
         isLoaded = true
     }
 
     override fun handleReload() {
         registerVanillaEnchants(this)
-
         DisplayCache.reload()
         EnchantSorter.reload(this)
         ExtraItemSupport.reload(this)
